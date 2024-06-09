@@ -7,12 +7,28 @@ const Index = () => {
   const [playlistName, setPlaylistName] = useState("");
   const [playlistDescription, setPlaylistDescription] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [currentSong, setCurrentSong] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const handleSavePlaylist = () => {
     setPlaylists([...playlists, { name: playlistName, description: playlistDescription }]);
     setPlaylistName("");
     setPlaylistDescription("");
     onClose();
+  };
+
+  const handlePlaySong = (songUrl) => {
+    setCurrentSong(songUrl);
+    setIsPlaying(true);
+  };
+
+  const handlePauseSong = () => {
+    setIsPlaying(false);
+  };
+
+  const handleStopSong = () => {
+    setCurrentSong(null);
+    setIsPlaying(false);
   };
 
   return (
@@ -29,16 +45,25 @@ const Index = () => {
           <Button leftIcon={<FaBackward />} colorScheme="teal" variant="solid">
             Previous
           </Button>
-          <Button leftIcon={<FaPlay />} colorScheme="teal" variant="solid">
-            Play
-          </Button>
-          <Button leftIcon={<FaPause />} colorScheme="teal" variant="solid">
-            Pause
-          </Button>
+          {isPlaying ? (
+            <Button leftIcon={<FaPause />} colorScheme="teal" variant="solid" onClick={handlePauseSong}>
+              Pause
+            </Button>
+          ) : (
+            <Button leftIcon={<FaPlay />} colorScheme="teal" variant="solid" onClick={() => handlePlaySong('path/to/song.mp3')}>
+              Play
+            </Button>
+          )}
           <Button leftIcon={<FaForward />} colorScheme="teal" variant="solid">
             Next
           </Button>
+          <Button colorScheme="red" variant="solid" onClick={handleStopSong}>
+            Stop
+          </Button>
         </VStack>
+        {currentSong && (
+          <audio src={currentSong} autoPlay={isPlaying} controls style={{ display: 'none' }} />
+        )}
         <Button colorScheme="teal" onClick={onOpen}>Create Playlist</Button>
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
